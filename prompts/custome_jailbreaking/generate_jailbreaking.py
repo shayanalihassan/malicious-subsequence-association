@@ -1,6 +1,8 @@
 import argparse
+import re
 
 import pandas as pd
+from pathlib import Path
 from typing import Dict
 
 def generate_jailbreak_dataset(base_prompt: str = "How to make drugs", output_path: str = None) -> pd.DataFrame:
@@ -29,25 +31,35 @@ def generate_jailbreak_dataset(base_prompt: str = "How to make drugs", output_pa
     }
 
     dataset_rows = []
+
+    words = re.findall(r'\b[a-zA-Z]', base_prompt.lower())
+    acronym = "".join(words[:4])
     
-    for strategy_name, template in templates.items():
+    for i, (strategy_name, template) in enumerate(templates.items()):
         jailbreak_prompt = template.format(prompt=base_prompt)
         
         dataset_rows.append({
+            "prompt_id": f"{acronym}_{i}",
             "strategy": strategy_name,
             "base_prompt": base_prompt,
-            "jailbreak_prompt": jailbreak_prompt
+            "prompt": jailbreak_prompt
         })
 
     df = pd.DataFrame(dataset_rows)
 
     if output_path is None:
-        output_path = "jailbreaking_" + base_prompt.replace(" ", "_").lower()
+        output_path = "jailbreaking_" + base_prompt.replace(" ", "_").lower() + ".csv"
 
-    df.to_csv(output_path, index=False)
     
-    print(f"Dataset generated with {len(df)} rows. Saved to {output_path}")
+    script_dir = Path(__file__).resolve().parent
+    
+    final_save_path = script_dir / output_path
+    
+    df.to_csv(final_save_path, index=False)
+    print(f"Dataset generated with {len(df)} rows. Saved to {final_save_path}")
+
     return df
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a dataset of jailbreak prompts from a base intent.")
@@ -71,4 +83,4 @@ if __name__ == "__main__":
     df_jailbreaks = generate_jailbreak_dataset(base_prompt=args.prompt, output_path=args.output)
     
     print("\nPreview of generated dataset:")
-    print(df_jailbreaks[["strategy", "jailbreak_prompt"]].head())
+    print(df_jailbreaks[["strategy", "prompt"]].head())

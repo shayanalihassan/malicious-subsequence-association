@@ -10,6 +10,9 @@ def prepare_harmbench() -> pd.DataFrame:
 def prepare_cs333() -> pd.DataFrame:
     pass
 
+def prepare_custome_jailbreaking() -> pd.DataFrame:
+    pass
+
 KNOWN_DATASETS: Dict[str, Callable[[], pd.DataFrame]] = {
     "HarmBench": prepare_harmbench,
 }
