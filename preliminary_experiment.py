@@ -16,11 +16,8 @@ from __future__ import annotations
 import json
 import math
 import random
-import re
-import sys
 import time
-from pathlib import Path
-from typing import Dict, Iterable, List, Sequence, Tuple
+from typing import Dict, List, Sequence, Tuple
 
 import pandas as pd
 from dotenv import load_dotenv
@@ -32,16 +29,10 @@ except ModuleNotFoundError:
 
 from src.configs import parse_args, ensure_api_key, ExperimentConfig
 from src.beam_search import choose_mask_positions, build_masked_template, find_expected_trigger, compute_word_priorities, rank_beam_candidates, generate_extensions, candidate_prior_score, WORD_RE
-from src.io_utils import log_message, normalize_prompt_records, load_checkpoint_state
+from src.io_utils import log_message, normalize_prompt_records, load_checkpoint_state, write_outputs, print_summary
 from src.llm import refill_masks, apply_fills, generate_response, judge_response
 from src.text_utils import format_subsequence, is_contiguous, locate_word_char_spans, SINGLE_WORD_RE, tokenize, detokenize
 
-
-
-def sanitize_fill_word(raw_value: str, fallback: str) -> str:
-    candidate = raw_value.strip().split()[0] if raw_value.strip() else ""
-    candidate = re.sub(r"^[^A-Za-z0-9]+|[^A-Za-z0-9'_-]+$", "", candidate)
-    return candidate if SINGLE_WORD_RE.match(candidate) else fallback
 
 
 def log_ratio(numerator: float, denominator: float, eps: float = 1e-6) -> float:

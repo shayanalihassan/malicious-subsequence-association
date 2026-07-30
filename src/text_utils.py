@@ -43,3 +43,8 @@ def format_subsequence(words: Sequence[str], indices: Sequence[int]) -> str:
             parts.append("...")
         parts.append(words[word_idx])
     return " ".join(parts)
+
+def sanitize_fill_word(raw_value: str, fallback: str) -> str:
+    candidate = raw_value.strip().split()[0] if raw_value.strip() else ""
+    candidate = re.sub(r"^[^A-Za-z0-9]+|[^A-Za-z0-9'_-]+$", "", candidate)
+    return candidate if SINGLE_WORD_RE.match(candidate) else fallback

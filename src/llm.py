@@ -8,7 +8,8 @@ try:
 except ModuleNotFoundError:
     OpenAI = None  # type: ignore[assignment]
 
-from src.text_utils import detokenize
+from src.text_utils import detokenize, sanitize_fill_word
+
 
 DRY_RUN_FILLERS = [
     "gentle",
